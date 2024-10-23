@@ -57,6 +57,7 @@ model Attachments {
   id         Int       @id @default(autoincrement())
   Messages   Messages? @relation(fields: [messagesId], references: [id])
   messagesId Int?
+  fileName   String
   url        String
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
