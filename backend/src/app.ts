@@ -2,6 +2,7 @@ import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { PrismaClient } from '@prisma/client'
+import cors from 'cors'
 
 import conversationRoutes from './routes/conversationRoutes'
 import attachmentRoutes from './routes/attachmentRoutes'
@@ -14,6 +15,13 @@ import errorHandler from './middlewares/errorHandler'
 
 const app = express()
 const httpServer = createServer(app)
+
+const corsOptions = {
+  origin: 'http://localhost:5173',
+}
+
+app.use(cors(corsOptions));
+
 const io = new Server(httpServer)
 export const prisma = new PrismaClient()
 
