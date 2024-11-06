@@ -1,1 +1,6 @@
 node_modules
+<<<<<<< HEAD
+=======
+.env
+prisma/migrations
+>>>>>>> 36be6228faa3cb66836c830dfac2646d489cc4d2

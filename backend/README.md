@@ -16,6 +16,8 @@ If you are cloning this repository for the first time, please do the following:
 ### First time initialization
 
 - Run `pnpm dlx prisma migrate dev --name init` to initialize the database
+- Run `pnpm dlx prisma generate` to initialize the prisma client
+- Run `pnpm swagger` to generate the swagger document
 
 ### Commits
 
