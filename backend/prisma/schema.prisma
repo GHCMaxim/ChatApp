@@ -27,8 +27,8 @@ model Users {
 model Messages {
   id              Int            @id @default(autoincrement())
   senderId        Int
-  Users           Users?         @relation(fields: [usersId], references: [id])
-  usersId         Int?
+  Users           Users?         @relation(fields: [senderId], references: [id])
+// usersId         Int?
   content         String
   createdAt       DateTime       @default(now())
   Conversations   Conversations? @relation(fields: [conversationsId], references: [id])
@@ -47,8 +47,8 @@ model Conversations {
 model Participants {
   id              Int            @id @default(autoincrement())
   userId          Int
-  Users           Users?         @relation(fields: [usersId], references: [id])
-  usersId         Int?
+  Users           Users?         @relation(fields: [userId], references: [id])
+// usersId         Int?
   Conversations   Conversations? @relation(fields: [conversationsId], references: [id])
   conversationsId Int?
 }

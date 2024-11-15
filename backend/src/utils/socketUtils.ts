@@ -42,7 +42,7 @@ export function setupSocketHandlers(io: Server) {
           const message = await prisma.messages.create({
             data: {
               content,
-              senderId,
+              Users: { connect: { id: senderId } },
               Conversations: { connect: { id: conversationId } },
               Attachments: {
                 connect: attachmentIds.map((id) => ({ id }))
