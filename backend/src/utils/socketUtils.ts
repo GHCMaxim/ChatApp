@@ -23,7 +23,7 @@ export function setupSocketHandlers(io: Server) {
     console.log(`User connected: ${socket.data.userId}`)
 
     socket.on('joinRoom', (roomId: string) => {
-      socket.join('1')
+      socket.join(roomId)
       console.log(`User joined room ${roomId}`)
     })
 

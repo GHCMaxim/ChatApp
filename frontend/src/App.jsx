@@ -1,5 +1,6 @@
-import { Auth } from './components';
+import {Auth, ChatWindow, LeftPanel} from './components';
 import Cookies from 'universal-cookie';
+import {useState} from "react";
 
 const cookies = new Cookies();
 
@@ -10,19 +11,21 @@ function App() {
         return <Auth />;
     }
 
+    const [conversationId, setConversationId] = useState();
+
+    const changeConversationId = (value) => {
+        setConversationId(value);
+        console.log(conversationId);
+    }
+
     return (
         <>
             {/* TODO: DashBoard or something*/}
 
-            <h3>You&#39;re logged in!</h3>
-            <button className={'btn btn-error text-white'}
-                onClick={() => {
-                    cookies.remove('token');
-                    cookies.remove('user');
-                    window.location.reload();
-                }}>
-                Logout
-            </button>
+            <div className="flex bg-nav-bg  h-screen">
+                <LeftPanel changeConversationId={changeConversationId} />
+                <ChatWindow conversationId={conversationId} />
+            </div>
         </>
     )
 }

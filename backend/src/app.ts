@@ -24,8 +24,8 @@ app.use(cors(corsOptions))
 
 const io = new Server(httpServer, {
   cors: {
-    origin: 'https://localhost:5173',
-    methods: ['GET', 'POST']
+    // origin: 'https://localhost:5173',
+    // methods: ['GET', 'POST']
   }
 })
 export const prisma = new PrismaClient()
