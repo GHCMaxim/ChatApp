@@ -49,7 +49,13 @@ const Conversation = React.memo(({
                                      onSelectConversation,
                                      user,
                                  }) => {
-    const { id, name, Messages } = conversation;
+    let { id, name, Messages, Participants } = conversation;
+    // If the conversation has no name, use the name of the other participant
+    if (name === '') {
+        const otherParticipant = Participants.find(p => p["Users"].id != user.id);
+        console.log(otherParticipant)
+        name = otherParticipant["Users"].username
+    }
     const latestMessage = Messages[0];
 
     const handleConversationChange = useCallback(() => {
@@ -75,15 +81,15 @@ const Conversation = React.memo(({
                 <div className='flex w-full justify-between items-center'>
                     <p className='text-white text-xl font-semibold'>{name}</p>
                     <p className='text-gray-400 text-sm'>
-                        {formatDate(latestMessage.createdAt)}
+                        {latestMessage ? formatDate(latestMessage.createdAt) : ""}
                     </p>
                 </div>
             </div>
             <div className='col-start-3 row-span-1 col-end-9'>
                 <div className='flex w-full justify-between items-center'>
                     <p className='text-gray-400 text-md truncate max-w-[70%]'>
-                        {user.id == latestMessage.senderId ? "You: " : ""}
-                        {latestMessage.content}
+                        {user.id == latestMessage?.senderId ? "You: " : ""}
+                        {latestMessage?.content}
                     </p>
                 </div>
             </div>

@@ -7,7 +7,7 @@ import cors from 'cors'
 import conversationRoutes from './routes/conversationRoutes'
 import attachmentRoutes from './routes/attachmentRoutes'
 import authRoutes from './routes/authRoutes'
-
+import userRoutes from './routes/userRoutes'
 import { authenticateToken } from './middlewares/auth'
 import { setupSocketHandlers } from './utils/socketUtils'
 import { initializeBucketR2 } from './utils/r2Utils'
@@ -38,7 +38,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/conversations', authenticateToken, conversationRoutes)
 app.use('/api/attachments', authenticateToken, attachmentRoutes)
-app.use('/api/users', authenticateToken)
+app.use('/api/users', authenticateToken, userRoutes)
 setupSocketHandlers(io)
 initializeBucketR2()
 

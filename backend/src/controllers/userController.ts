@@ -3,7 +3,7 @@ import { prisma } from '../app'
 
 export async function getAllUser(req: Request, res: Response) {
   try {
-    const users = prisma.users.findMany({
+    const users = await prisma.users.findMany({
       select: {
         id: true,
         username: true,
@@ -11,6 +11,7 @@ export async function getAllUser(req: Request, res: Response) {
       }
     })
 
+  console.log(users)
     res.status(200).json(users)
   } catch (err) {
     console.log(err)

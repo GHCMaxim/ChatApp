@@ -44,7 +44,7 @@ export const createNewConversation = async (
 export const getConversations = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId
-
+    
     const conversations = await prisma.conversations.findMany({
       where: {
         Participants: {
@@ -55,7 +55,9 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
       },
       include: {
         Participants: {
-          include: {
+          select: {
+            userId: true,
+            conversationsId: true,
             Users: {
               select: {
                 id: true,
@@ -72,7 +74,6 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
         }
       }
     })
-
     res.json(conversations)
   } catch (error) {
     res.status(500).json({ error: 'Error fetching conversations' })

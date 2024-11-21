@@ -68,7 +68,7 @@ const UserSearchBar = () => {
     const createConversation = async (userId) => {
         try {
             // Make sure this matches your actual API endpoint
-            const response = await fetch('/api/v1/conversations', {
+            const response = await fetch('http://localhost:3000/api/conversations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

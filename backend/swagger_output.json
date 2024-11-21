@@ -11,34 +11,7 @@
     "http"
   ],
   "paths": {
-    "/upload": {
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "messageId": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      }
-    },
-    "/register": {
+    "/api/auth/register": {
       "post": {
         "description": "",
         "parameters": [
@@ -74,7 +47,7 @@
         }
       }
     },
-    "/login": {
+    "/api/auth/login": {
       "post": {
         "description": "",
         "parameters": [
@@ -107,7 +80,7 @@
         }
       }
     },
-    "/": {
+    "/api/conversations/": {
       "post": {
         "description": "",
         "parameters": [
@@ -148,7 +121,7 @@
         }
       }
     },
-    "/{id}": {
+    "/api/conversations/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -168,6 +141,33 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/attachments/upload": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           }
         }
       }
