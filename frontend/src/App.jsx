@@ -1,33 +1,50 @@
-import {Auth, ChatWindow, LeftPanel} from './components';
-import Cookies from 'universal-cookie';
-import {useState} from "react";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useState } from 'react'
 
-const cookies = new Cookies();
-
-const authToken = cookies.get('token');
+import AuthPage from './pages/Auth'
+import ChatPage from './pages/Chat'
+import NotFound from './pages/NotFound'
+import useInit from './hooks/useInit'
+import { useSelector } from 'react-redux'
 
 function App() {
-    if (!authToken) {
-        return <Auth />;
-    }
 
-    const [conversationId, setConversationId] = useState();
+  const { loggedIn } = useSelector((state) => state.authReducer)
 
-    const changeConversationId = (value) => {
-        setConversationId(value);
-        console.log(conversationId);
-    }
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path='/login'
+          element={!loggedIn ? <AuthPage /> : <Navigate to='/' />}
+        />
 
-    return (
-        <>
-            {/* TODO: DashBoard or something*/}
+        <Route
+          path='/'
+          element={
+            loggedIn ? (
+              <ChatPage />
+            ) : (
+              <Navigate to='/login' />
+            )
+          }
+        />
 
-            <div className="flex bg-nav-bg  h-screen">
-                <LeftPanel changeConversationId={changeConversationId} />
-                <ChatWindow conversationId={conversationId} />
-            </div>
-        </>
-    )
+        <Route
+          path='/conversation/:id'
+          element={
+            loggedIn ? (
+              <ChatPage />
+            ) : (
+              <Navigate to='/login' />
+            )
+          }
+        />
+
+        <Route path='*' element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App
