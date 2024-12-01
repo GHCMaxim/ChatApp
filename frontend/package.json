@@ -15,6 +15,7 @@
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "daisyui": "^4.12.13",
+    "dotenv": "^16.4.5",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
     "postcss": "^8.4.47",
