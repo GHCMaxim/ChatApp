@@ -1,12 +1,13 @@
 import { Server, Socket } from "socket.io";
 import { getConversationMembers, sendMessage } from '../controllers/conversationController'
+import { prisma } from "../app";
 
 export const messagingController = (io: Server, socket: Socket) => {
   socket.on("user:newMessage", async ({ userId, conversationId, content }) => {
     if (!userId) return
-    
+
     // Save message to database
-    const result = await sendMessage({content, conversationId, userId});
+    const result = await sendMessage({ content, conversationId, userId });
 
     // Get all sockets in room
     const socketsInRoom = await io.in(conversationId.toString()).allSockets();
@@ -37,7 +38,7 @@ export const messagingController = (io: Server, socket: Socket) => {
     // Broadcast message to room
     console.log(`User ${userId} sent message to room ${conversationId} with socket id ${socket.id}`);
     io.timeout(180000)
-    .to(conversationId + "")
+      .to(conversationId + "")
       .emit(
         "user:sendMessage",
         {
@@ -45,5 +46,18 @@ export const messagingController = (io: Server, socket: Socket) => {
           message: result
         }
       );
+  });
+
+  socket.on("user:readMessage", async ({ userId, messageId, conversationId }) => {
+    if (!userId || !messageId || !conversationId) return;
+
+    await prisma.messagesReadStatus.create({
+      data: {
+        userId,
+        messageId,
+        conversationId
+      }
+    });
+    io.to(conversationId + "").emit("user:messageRead", { messageId, userId, conversationId });
   });
 };
