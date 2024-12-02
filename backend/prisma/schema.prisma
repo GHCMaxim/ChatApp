@@ -14,42 +14,44 @@ datasource db {
 }
 
 model Users {
-  id              Int            @id @default(autoincrement())
-  email           String         @unique
-  username        String
-  hashed_password String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  Messages        Messages[]
-  Participants    Participants[]
+  id                 Int                  @id @default(autoincrement())
+  email              String               @unique
+  username           String
+  hashed_password    String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Messages           Messages[]
+  Participants       Participants[]
+  MessagesReadStatus MessagesReadStatus[]
 }
 
 model Messages {
-  id              Int            @id @default(autoincrement())
-  senderId        Int
-  Users           Users?         @relation(fields: [senderId], references: [id])
-// usersId         Int?
-  content         String
-  createdAt       DateTime       @default(now())
-  Conversations   Conversations? @relation(fields: [conversationId], references: [id])
-  conversationId Int?
-  Attachments     Attachments[]
+  id                 Int                  @id @default(autoincrement())
+  senderId           Int
+  Users              Users?               @relation(fields: [senderId], references: [id])
+  // usersId         Int?
+  content            String
+  createdAt          DateTime             @default(now())
+  Conversations      Conversations?       @relation(fields: [conversationId], references: [id])
+  conversationId     Int?
+  Attachments        Attachments[]
+  MessagesReadStatus MessagesReadStatus[]
 }
 
 model Conversations {
-  id           Int            @id @default(autoincrement())
-  name         String
-  type         String
-  Messages     Messages[]
-  Participants Participants[]
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  type               String
+  Messages           Messages[]
+  Participants       Participants[]
+  MessagesReadStatus MessagesReadStatus[]
 }
 
 model Participants {
-  id              Int            @id @default(autoincrement())
-  userId          Int
-  Users           Users?         @relation(fields: [userId], references: [id])
-// usersId         Int?
-  Conversations   Conversations? @relation(fields: [conversationId], references: [id])
+  id             Int            @id @default(autoincrement())
+  userId         Int
+  Users          Users?         @relation(fields: [userId], references: [id])
+  Conversations  Conversations? @relation(fields: [conversationId], references: [id])
   conversationId Int?
 }
 
@@ -61,4 +63,15 @@ model Attachments {
   url        String
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+}
+
+model MessagesReadStatus {
+  id             Int            @id @default(autoincrement())
+  messageId      Int
+  userId         Int
+  readAt         DateTime       @default(now())
+  conversationId Int?
+  Messages       Messages?      @relation(fields: [messageId], references: [id])
+  Users          Users?         @relation(fields: [userId], references: [id])
+  Conversations  Conversations? @relation(fields: [conversationId], references: [id])
 }
