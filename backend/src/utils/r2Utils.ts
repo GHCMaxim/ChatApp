@@ -28,7 +28,7 @@ async function getSignedURL(key: String) {
       Key: key
     }),
     {
-      expiresIn: 6 * 60 * 60
+      expiresIn: 24 * 60 * 60
     }
   )
   return response
@@ -42,7 +42,7 @@ async function putSignedURL(key: string) {
       Key: key
     }),
     {
-      expiresIn: 6 * 60 * 60
+      expiresIn: 24 * 60 * 60
     }
   )
   return response

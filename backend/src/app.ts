@@ -13,7 +13,7 @@ import errorHandler from './middlewares/errorHandler'
 const app = express()
 
 const corsOptions = {
-  origin: 'http://localhost:5173'
+  // origin: 'http://localhost:5173'
 }
 
 app.use(cors(corsOptions))
