@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { conversationActions } from '../../store/conversationSlice'
 import websocketClient from '../../utils/WebSocketClient'
+import React from 'react';
+import { createPeerConnection, createOffer, createAnswer, handleAnswer, handleIceCandidate, socket } from '../../utils/webrtc';
 
-export const MessageInput = ({sendMessage}) => {
+export const MessageInput = ({ sendMessage }) => {
   const [message, setMessage] = useState('')
 
   const handleSubmit = (e) => {
@@ -36,10 +38,15 @@ export const MessageInput = ({sendMessage}) => {
 
 const ChatWindow = () => {
   const { user } = useSelector((state) => state.userReducer)
-  const { currentConversation } = useSelector((state) => state.conversationReducer) 
+  const { currentConversation } = useSelector((state) => state.conversationReducer)
   const dispatch = useDispatch()
   const messagesEndRef = useRef(null)
-  
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [peerConnection, setPeerConnection] = useState(null);
+  const [remoteSocketId, setRemoteSocketId] = useState(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
   }
@@ -47,6 +54,40 @@ const ChatWindow = () => {
   useEffect(() => {
     scrollToBottom()
   }, [currentConversation])
+
+  useEffect(() => {
+    socket.on('webrtc:offer', async ({ offer, from }) => {
+      setRemoteSocketId(from);
+      const pc = createPeerConnection(remoteVideoRef);
+      setPeerConnection(pc);
+      await createAnswer(pc, offer, localStream, from);
+    });
+
+    socket.on('webrtc:answer', async ({ answer }) => {
+      await handleAnswer(peerConnection, answer);
+    });
+
+    socket.on('webrtc:ice-candidate', async ({ candidate }) => {
+      await handleIceCandidate(peerConnection, candidate);
+    });
+
+    return () => {
+      socket.off('webrtc:offer');
+      socket.off('webrtc:answer');
+      socket.off('webrtc:ice-candidate');
+    };
+  }, [localStream, peerConnection]);
+
+  const startCall = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    localVideoRef.current.srcObject = stream;
+    setLocalStream(stream);
+
+    const pc = createPeerConnection(remoteVideoRef);
+    setPeerConnection(pc);
+
+    await createOffer(pc, stream, remoteSocketId);
+  };
 
   if (!currentConversation) {
     return (
@@ -77,16 +118,14 @@ const ChatWindow = () => {
         {currentConversation && currentConversation.Messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex items-end mb-2 ${
-              msg.senderId === currentUserId ? 'justify-end' : 'justify-start'
-            }`}
+            className={`flex items-end mb-2 ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'
+              }`}
           >
             <div
-              className={`px-4 py-2 rounded-lg ${
-                msg.senderId === currentUserId
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-800'
-              }`}
+              className={`px-4 py-2 rounded-lg ${msg.senderId === currentUserId
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-800'
+                }`}
             >
               {msg.content}
             </div>
@@ -97,7 +136,12 @@ const ChatWindow = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      {conversationId && <MessageInput conversationId={conversationId} sendMessage={sendMessage}/>}
+      {conversationId && <MessageInput conversationId={conversationId} sendMessage={sendMessage} />}
+      <div>
+        <video ref={localVideoRef} autoPlay muted />
+        <video ref={remoteVideoRef} autoPlay />
+        <button onClick={startCall}>Start Call</button>
+      </div>
     </div>
   )
 }

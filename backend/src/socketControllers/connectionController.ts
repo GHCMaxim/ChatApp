@@ -55,7 +55,7 @@ export const offlineController = (io: Server, socket: Socket) => {
 export const disconnectingController = (io: Server, socket: Socket) => {
   socket.on("disconnecting", async (userId) => {
     if (!userId) return;
-    
+
     const result = await getSocketDetails(
       socket.data.userid
     );
@@ -71,7 +71,19 @@ export const disconnectingController = (io: Server, socket: Socket) => {
 };
 
 export const joinRoomController = (io: Server, socket: Socket) => {
-  socket.on("user:joinRooms", ({ rooms }: {rooms: string[]}) => {
+  socket.on("user:joinRooms", ({ rooms }: { rooms: string[] }) => {
     socket.join(rooms);
+  });
+
+  socket.on("webrtc:offer", ({ offer, to }) => {
+    socket.to(to).emit("webrtc:offer", { offer, from: socket.id });
+  });
+
+  socket.on('webrtc:answer', ({ answer, to }) => {
+    socket.to(to).emit('webrtc:answer', { answer, from: socket.id });
+  });
+
+  socket.on('webrtc:ice-candidate', ({ candidate, to }) => {
+    socket.to(to).emit('webrtc:ice-candidate', { candidate, from: socket.id });
   });
 };
