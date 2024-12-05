@@ -58,9 +58,9 @@ const ChatWindow = () => {
   useEffect(() => {
     socket.on('webrtc:offer', async ({ offer, from }) => {
       setRemoteSocketId(from);
-      const pc = createPeerConnection(remoteVideoRef);
+      const pc = createPeerConnection(remoteVideoRef.current, from);
       setPeerConnection(pc);
-      await createAnswer(pc, offer, localStream, from);
+      await createAnswer(pc, localStream, offer, from);
     });
 
     socket.on('webrtc:answer', async ({ answer }) => {
@@ -83,7 +83,7 @@ const ChatWindow = () => {
     localVideoRef.current.srcObject = stream;
     setLocalStream(stream);
 
-    const pc = createPeerConnection(remoteVideoRef);
+    const pc = createPeerConnection(remoteVideoRef.current, remoteSocketId);
     setPeerConnection(pc);
 
     await createOffer(pc, stream, remoteSocketId);

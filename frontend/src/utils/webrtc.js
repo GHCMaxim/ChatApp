@@ -1,10 +1,10 @@
 import { io } from "socket.io-client";
 
-const socket = io(process.env.REACT_APP_SOCKET_URL);
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 
-export const createPeerConnection = (remoteStream) => {
+export const createPeerConnection = (remoteStream, remoteSocketId) => {
     const peerConnection = new RTCPeerConnection({
-        iceServers: [
+        iceServers: [s
             { urls: "stun:stun.l.google.com:19302" },
             { urls: "stun:stun1.l.google.com:19302" },
             { urls: "stun:stun2.l.google.com:19302" }
@@ -54,5 +54,24 @@ export const handleAnswer = async (peerConnection, answer) => {
 export const handleIceCandidate = async (peerConnection, candidate) => {
     await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
 }
+
+socket.on('connect', () => {
+    console.log('Connected to signaling server');
+});
+
+socket.on('webrtc:offer', async ({ offer, from }) => {
+    console.log('Received offer:', offer);
+    // Handle the offer
+});
+
+socket.on('webrtc:answer', async ({ answer, from }) => {
+    console.log('Received answer:', answer);
+    // Handle the answer
+});
+
+socket.on('webrtc:ice-candidate', async ({ candidate, from }) => {
+    console.log('Received ICE candidate:', candidate);
+    // Handle the ICE candidate
+});
 
 export default socket;
