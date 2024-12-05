@@ -6,7 +6,7 @@ const cookies = new Cookies();
 class WebSocketClient {
   constructor(url, token) {
     if (!WebSocketClient.instance) {
-      this.socket = new io(url)
+      this.socket = new io(url);
       WebSocketClient.instance = this;
     }
 
@@ -14,18 +14,15 @@ class WebSocketClient {
   }
 
   emit(action, payload, fn) {
-    if (this.socket)
-        this.socket.emit(action, payload, fn)
-    };
+    if (this.socket) this.socket.emit(action, payload, fn);
+  }
 
   listen(action, fn) {
-    if (this.socket)
-        this.socket.on(action, fn)
-    };
-
+    if (this.socket) this.socket.on(action, fn);
+  }
 }
 
-const token = cookies.get('token');
+const token = cookies.get("token");
 const instance = new WebSocketClient(SOCKET_URL, token);
 Object.freeze(instance);
 

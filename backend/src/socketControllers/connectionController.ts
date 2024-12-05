@@ -1,5 +1,23 @@
 import { Server, Socket } from "socket.io";
 import { prisma } from "../app";
+import { socketUserMap } from "../utils/socketUtils";
+
+export const getSocketIdsByConversationId = async (
+  conversationId: number
+): Promise<string[]> => {
+  const participants = await prisma.participants.findMany({
+    where: {
+      conversationId,
+    },
+    select: {
+      userId: true,
+    },
+  });
+  const socketIds = participants
+    .map((participant) => socketUserMap.get(participant.userId.toString()))
+    .filter((socketId) => socketId !== undefined) as string[];
+  return socketIds;
+};
 
 export const getSocketDetails = async (userId: number) => {
   // Get all rooms
@@ -7,15 +25,17 @@ export const getSocketDetails = async (userId: number) => {
     where: {
       userId,
       conversationId: {
-        not: null
-      }
+        not: null,
+      },
     },
     select: {
       conversationId: true,
     },
   });
 
-  return result.map((room) => room.conversationId?.toString() as string) as string[];
+  return result.map(
+    (room) => room.conversationId?.toString() as string
+  ) as string[];
 };
 
 export const onlineController = (io: Server, socket: Socket) => {
@@ -32,7 +52,6 @@ export const onlineController = (io: Server, socket: Socket) => {
     }
 
     // TODO Update user status to online, last seen undefined
-
   });
 };
 
@@ -45,9 +64,7 @@ export const offlineController = (io: Server, socket: Socket) => {
 
     // TODO Update user status to offline, last seen
 
-    socket
-      .to(result)
-      .emit("user:offline", { userId, time });
+    socket.to(result).emit("user:offline", { userId, time });
   });
 };
 
@@ -56,17 +73,13 @@ export const disconnectingController = (io: Server, socket: Socket) => {
   socket.on("disconnecting", async (userId) => {
     if (!userId) return;
 
-    const result = await getSocketDetails(
-      socket.data.userid
-    );
+    const result = await getSocketDetails(socket.data.userid);
 
     const time = new Date(Date.now()).toISOString();
 
     // TODO: update user status to offline, last seen
 
-    socket
-      .to(result)
-      .emit("user:offline", { userId, time });
+    socket.to(result).emit("user:offline", { userId, time });
   });
 };
 
@@ -75,15 +88,33 @@ export const joinRoomController = (io: Server, socket: Socket) => {
     socket.join(rooms);
   });
 
-  socket.on("webrtc:offer", ({ offer, to }) => {
-    socket.to(to).emit("webrtc:offer", { offer, from: socket.id });
+  // socket.on("webrtc:offer", async ({ offer, to }) => {
+  //   const targetSocketId = await getSocketIdsByConversationId(to);
+  //   targetSocketId.forEach((socketId) => {
+  //     socket.to(socketId).emit("webrtc:offer", { offer, from: socket.id });
+  //   });
+  // });
+
+  // socket.on("webrtc:answer", ({ answer, to }) => {
+  //   socket.to(to).emit("webrtc:answer", { answer, from: socket.id });
+  // });
+
+  // socket.on("webrtc:ice-candidate", ({ candidate, to }) => {
+  //   socket.to(to).emit("webrtc:ice-candidate", { candidate, from: socket.id });
+  // });
+  socket.on("webrtc:offer", async ({ offer, conversationId }) => {
+    const socketsInRoom = await io.in(conversationId.toString()).fetchSockets();
+    socketsInRoom.forEach((socketId) => {
+      console.log(socketId.data);
+      socket.to(socketId.data).emit("webrtc:offer", { offer, from: socket.id });
+    });
   });
 
-  socket.on('webrtc:answer', ({ answer, to }) => {
-    socket.to(to).emit('webrtc:answer', { answer, from: socket.id });
+  socket.on("webrtc:answer", ({ answer, to }) => {
+    socket.to(to).emit("webrtc:answer", { answer, from: socket.id });
   });
 
-  socket.on('webrtc:ice-candidate', ({ candidate, to }) => {
-    socket.to(to).emit('webrtc:ice-candidate', { candidate, from: socket.id });
+  socket.on("webrtc:ice-candidate", ({ candidate, to }) => {
+    socket.to(to).emit("webrtc:ice-candidate", { candidate, from: socket.id });
   });
 };

@@ -1,17 +1,20 @@
 import { Server, Socket } from "socket.io";
-import { getConversationMembers, sendMessage } from '../controllers/conversationController'
+import {
+  getConversationMembers,
+  sendMessage,
+} from "../controllers/conversationController";
 import { prisma } from "../app";
 
 export const messagingController = (io: Server, socket: Socket) => {
   socket.on("user:newMessage", async ({ userId, conversationId, content }) => {
-    if (!userId) return
+    if (!userId) return;
 
     // Save message to database
     const result = await sendMessage({ content, conversationId, userId });
 
     // Get all sockets in room
-    const socketsInRoom = await io.in(conversationId.toString()).allSockets();
-    console.log(`Sockets in room ${conversationId}: ${socketsInRoom.size}`);
+    const socketsInRoom = await io.in(conversationId.toString()).fetchSockets();
+    console.log(`Sockets in room ${conversationId}: ${socketsInRoom.length}`);
 
     // Get all users in conversation
     const members = await getConversationMembers(conversationId);
@@ -22,13 +25,18 @@ export const messagingController = (io: Server, socket: Socket) => {
     // Get all socket connections
     const allSockets = await io.fetchSockets();
     for (const socket of allSockets) {
-      console.log(`Socket ${socket.id} is connected with user ${socket.data.userId}`);
+      console.log(
+        `Socket ${socket.id} is connected with user ${socket.data.userId}`
+      );
     }
 
     // Find and join missing users' sockets to room
-    members.forEach(memberId => {
-      allSockets.forEach(socket => {
-        if (socket.data.userId === memberId && !socketsInRoom.has(socket.id)) {
+    members.forEach((memberId) => {
+      allSockets.forEach((socket) => {
+        if (
+          socket.data.userId === memberId &&
+          !socketsInRoom.includes(socket)
+        ) {
           console.log(`User ${memberId} is joining room ${conversationId}`);
           socket.join(conversationId + "");
         }
@@ -36,28 +44,34 @@ export const messagingController = (io: Server, socket: Socket) => {
     });
 
     // Broadcast message to room
-    console.log(`User ${userId} sent message to room ${conversationId} with socket id ${socket.id}`);
+    console.log(
+      `User ${userId} sent message to room ${conversationId} with socket id ${socket.id}`
+    );
     io.timeout(180000)
       .to(conversationId + "")
-      .emit(
-        "user:sendMessage",
-        {
+      .emit("user:sendMessage", {
+        conversationId,
+        message: result,
+      });
+  });
+
+  socket.on(
+    "user:readMessage",
+    async ({ userId, messageId, conversationId }) => {
+      if (!userId || !messageId || !conversationId) return;
+
+      await prisma.messagesReadStatus.create({
+        data: {
+          userId,
+          messageId,
           conversationId,
-          message: result
-        }
-      );
-  });
-
-  socket.on("user:readMessage", async ({ userId, messageId, conversationId }) => {
-    if (!userId || !messageId || !conversationId) return;
-
-    await prisma.messagesReadStatus.create({
-      data: {
-        userId,
+        },
+      });
+      io.to(conversationId + "").emit("user:messageRead", {
         messageId,
-        conversationId
-      }
-    });
-    io.to(conversationId + "").emit("user:messageRead", { messageId, userId, conversationId });
-  });
+        userId,
+        conversationId,
+      });
+    }
+  );
 };

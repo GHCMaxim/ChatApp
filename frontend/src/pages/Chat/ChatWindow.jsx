@@ -83,10 +83,10 @@ const ChatWindow = () => {
     localVideoRef.current.srcObject = stream;
     setLocalStream(stream);
 
-    const pc = createPeerConnection(remoteVideoRef.current, remoteSocketId);
+    const pc = createPeerConnection(remoteVideoRef.current, conversationId);
     setPeerConnection(pc);
 
-    await createOffer(pc, stream, remoteSocketId);
+    await createOffer(pc, stream, conversationId);
   };
 
   if (!currentConversation) {

@@ -1,12 +1,12 @@
-import { createServer } from 'http'
+import { createServer } from "http";
 
-import { app } from './app'
+import { app } from "./app";
 
-const httpServer = createServer(app)
+const httpServer = createServer(app);
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+  console.log(`Server running on port ${PORT}`);
+});
 
-export default httpServer
+export default httpServer;

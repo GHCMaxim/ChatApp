@@ -1,15 +1,20 @@
-import { Server } from 'socket.io'
-import httpServer from './server'
-import { verifyToken } from './utils/authUtils'
-import { disconnectingController, joinRoomController, offlineController, onlineController } from './socketControllers/connectionController'
-import { messagingController } from './socketControllers/messageController'
+import { Server } from "socket.io";
+import httpServer from "./server";
+import { verifyToken } from "./utils/authUtils";
+import {
+  disconnectingController,
+  joinRoomController,
+  offlineController,
+  onlineController,
+} from "./socketControllers/connectionController";
+import { messagingController } from "./socketControllers/messageController";
 
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST']
-  }
-})
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
 
 // io.use((socket, next) => {
 //   const token = socket.handshake.auth.token
@@ -27,7 +32,7 @@ const io = new Server(httpServer, {
 //   next()
 // })
 
-io.on('connection', async (socket) => {
+io.on("connection", async (socket) => {
   // -------------Connection controls -------------- //
   // socket come online
   onlineController(io, socket);
@@ -45,4 +50,4 @@ io.on('connection', async (socket) => {
 
   // -------------Message controls -------------- //
   messagingController(io, socket);
-})
+});
