@@ -1,15 +1,15 @@
 import { useState } from "react";
 import axiosInstance from "../utils/axios";
 
-const useFetch = ({method, url}, successFn, errorFn) => {
+const useFetch = ({ method, url }, successFn, errorFn) => {
   const [requestState, setRequestState] = useState();
 
-  const requestFunction = async (values, query='') => {
+  const requestFunction = async (values, query = '') => {
     const methodUpper = method.toUpperCase()
 
     try {
       setRequestState("loading")
-      const {data, status} = await axiosInstance({
+      const { data, status } = await axiosInstance({
         method: methodUpper,
         url: url + query,
         data: values

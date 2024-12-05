@@ -150,7 +150,7 @@ const ChatWindow = () => {
       return null;
     }
 
-    const response = await fetch('http://localhost:3000/api/attachments/upload', {
+    const response = await fetch(`${import.meta.env.VITE_URL}/attachments/upload`, {
       method: 'PUT',
       body: formData,
       headers: {

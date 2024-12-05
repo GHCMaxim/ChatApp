@@ -103,11 +103,11 @@ const ConversationList = () => {
   const { conversations, currentConversation } = useSelector((state) => state.conversationReducer)
   const { user } = useSelector((state) => state.userReducer)
   const dispatch = useDispatch()
- 
-  const {reqFunc: getConversations, reqState }= useFetch({method: "GET", url: "/conversations"}, 
+
+  const { reqFunc: getConversations, reqState } = useFetch({ method: "GET", url: `${import.meta.env.VITE_URL}/conversations` },
     (data) => {
       dispatch(conversationActions.setConversations(data))
-    }, 
+    },
     (error) => {
       console.log(error)
     }
@@ -119,7 +119,7 @@ const ConversationList = () => {
 
   // Handler to update active conversation
   const handleSelectConversation = useCallback((conversationId) => {
-    dispatch(conversationActions.setCurrentConversation({id: conversationId}))
+    dispatch(conversationActions.setCurrentConversation({ id: conversationId }))
   }, [])
 
   // Render loading or error states
@@ -144,6 +144,9 @@ const ConversationList = () => {
       </div>
     )
   }
+
+  console.log(conversations)
+  console.log(typeof conversations)
 
   return (
     <div className='p-4 w-full h-fit'>

@@ -26,7 +26,7 @@ class WebSocketClient {
 }
 
 const token = cookies.get('token');
-const instance = new WebSocketClient(SOCKET_URL, token);
+const instance = new WebSocketClient("https://api.minim.lol", token);
 Object.freeze(instance);
 
 export default instance;

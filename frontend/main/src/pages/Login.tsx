@@ -2,7 +2,6 @@ import { useState } from "react";
 import { LoaderIcon } from 'lucide-react';
 import Cookies from 'universal-cookie';
 
-const URL = 'http://localhost:3000/api/auth';
 const cookies = new Cookies();
 
 interface FormState {
@@ -204,7 +203,7 @@ const Auth = () => {
       setIsLoading(true);
 
       try {
-          const endpoint = URL + (!isSignUp ? '/login' : '/register');
+          const endpoint =   `${import.meta.env. $(!isSignUp ? '/login' : '/register')`;
           const response = await fetch(endpoint, {
               method: 'POST',
               headers: {

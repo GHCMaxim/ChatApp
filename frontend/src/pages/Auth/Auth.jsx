@@ -42,7 +42,7 @@ const FloatingLabelInput = ({ type, name, label, onChange, value, error }) => {
                 bg-input-bg border-1 appearance-none focus:outline-none focus:ring-0 
                 peer ${error ? 'border-red-500' : ' focus:border-blue-600'}`}
         placeholder=' '
-        // required={true}
+      // required={true}
       />
       <label
         htmlFor={name}
@@ -50,16 +50,14 @@ const FloatingLabelInput = ({ type, name, label, onChange, value, error }) => {
                 peer-focus:px-2 peer-placeholder-shown:scale-100
                 
                 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-8 left-1
-                ${
-                  error
-                    ? 'text-red-500'
-                    : 'text-login-text  peer-placeholder-shown:-translate-y-1/2 '
-                } 
-                ${
-                  (isFocused || value) && !error
-                    ? 'peer-focus:text-blue-600'
-                    : ''
-                }`}
+                ${error
+            ? 'text-red-500'
+            : 'text-login-text  peer-placeholder-shown:-translate-y-1/2 '
+          } 
+                ${(isFocused || value) && !error
+            ? 'peer-focus:text-blue-600'
+            : ''
+          }`}
       >
         {label}
       </label>
@@ -199,9 +197,11 @@ const Auth = () => {
     }
   }
 
-  const {reqFunc, reqState} = useFetch({
+  const { reqFunc, reqState } = useFetch({
     method: 'POST',
-    url: '/auth' + (!isSignUp ? '/login' : '/register')},
+    // url: '/auth' + (!isSignUp ? '/login' : '/register')},
+    url: `${import.meta.env.VITE_URL}/auth` + (!isSignUp ? '/login' : '/register')
+  },
     (data) => {
       dispatch(authActions.login({ token: data.token }))
       dispatch(userActions.setUser(data.user))
@@ -316,10 +316,9 @@ const Auth = () => {
             type='submit'
             className={
               ' text-neutral-50 p-2.5 rounded-md hover:bg-opacity-90 transition-colors' +
-              `${
-                !(!isSignUp || termsAccepted)
-                  ? ' bg-gray-700 '
-                  : ' bg-login-btn'
+              `${!(!isSignUp || termsAccepted)
+                ? ' bg-gray-700 '
+                : ' bg-login-btn'
               }`
             }
             disabled={!(!isSignUp || termsAccepted) || reqState === 'loading'}
